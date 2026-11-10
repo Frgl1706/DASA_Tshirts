@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DASA T-Shirts Generator</title>
+
+<style>
+/* =========================
+FONTS (仮想指定)
+========================= */
+@font-face { font-family: 'title_01'; src: url('title_01.otf'); }
+@font-face { font-family: 'title_02'; src: url('title_02.otf'); }
+@font-face { font-family: 'nicoca'; src: url('nicoca'); }
+@font-face { font-family: 'mplus-black'; src: url('MPLUS1p-ExtraBold.ttf'); font-weight: 900; }
+@font-face { font-family: 'mplus-thin'; src: url('MPLUS1p-Light.ttf'); font-weight: 100; }
+
+:root {
+  --red: #ff0000;
+  --bg-black: #080808;
+  --panel: #111111;
+  --white: #ffffff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-black);
+  color: var(--red);
+  font-family: 'mplus-black', sans-serif; /* ベースはM+極太 */
+  font-weight: 900;
+  overflow-x: hidden;
+}
+
+/* =========================
+HEADER
+========================= */
+header {
+  position: sticky;
+  top: 0;
+  height: 80px;
+  background: var(--red);
+  color: var(--white);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 15px;
+  z-index: 100;
+  font-family: 'mplus-black', sans-serif; /* 一番上部のバーにM+系指定 */
+}
+
+.logoArea {
+  display: flex;
+  flex-direction: column;
+}
+
+.logoJP {
+  font-size: 55px;
+  line-height: 1;
+  letter-spacing: -8px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.logoJP span {
+  font-size: 18px;
+  writing-mode: vertical-rl;
+  margin-left: 1px;
+  letter-spacing: 0;
+}
+
+.logoEN {
+  font-size: 9px;
+  letter-spacing: 2px;
+  margin-top: 1px;
+}
+
+.menuButton {
+  width: 50px;
+  height: 50px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+}
+
+.menuButton img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.menuText {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  font-size: 10px;
+  color: white;
+  transform: rotate(-15deg);
+}
+
+/* =========================
+HERO BANNER
+========================= */
+.hero-banner {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-image: url('title_bar_futbolka.jpg');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 2px solid var(--bg-black);
+}
+
+.hero-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.hero-text {
+  position: relative;
+  z-index: 1;
+  color: var(--white);
+  font-family: 'title_01', 'title_02'; /* nicoca.ttf指定 */
+  font-size: 20px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+.hero-text span {
+  font-size: 36px;
+}
+
+.hero-sub {
+  position: absolute;
+  bottom: 5px;
+  right: 10px;
+  z-index: 1;
+  color: var(--white);
+  font-size: 12px;
+  font-family: 'mplus-black';
+  letter-spacing: 1px;
+}
+
+/* =========================
+MAIN LAYOUT (2 Column)
+========================= */
+.homeCompact {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  gap: 15px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.col-left, .col-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.col-title {
+  font-family: 'mplus-black', sans-serif;
+  font-size: 20px;
+  color: var(--red);
+  text-shadow: 1px 1px 2px rgba(255,0,0,0.3);
+}
+
+/* =========================
+LEFT: GENERATOR
+========================= */
+.miniShirt {
+  width: 100%;
+  aspect-ratio: 1 / 1.1;
+  background: var(--white);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: var(--black);
+  padding: 10px;
+  overflow: hidden;
+  border: 1px solid #ccc;
+  
+  /* 発光エフェクト (Tシャツ生成画面のみ) */
+  box-shadow: 0 0 25px 8px rgba(255, 255, 255, 0.6);
+}
+
+.shirtText {
+  font-family: 'title_01', 'title_02', sans-serif;
+  font-size: 24px;
+  line-height: 1.2;
+  word-break: break-word;
+  transition: transform 0.1s, font-weight 0.1s;
+}
+
+.action-row {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-outline {
+  flex: 1;
+  background: transparent;
+  border: 2px solid var(--red);
+  color: var(--red);
+  padding: 8px;
+  border-radius: 20px;
+  font-family: 'mplus-black', sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  text-align: center;
+}
+
+.generateButton {
+  width: 100%;
+  height: 60px;
+  background: var(--red);
+  border: none;
+  color: var(--white);
+  font-size: 28px;
+  font-family: 'mplus-black', sans-serif;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 900;
+  box-shadow: 0 4px 0 #8b0000;
+}
+.generateButton:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+/* =========================
+RIGHT: SCORES
+========================= */
+.preset-row {
+  display: flex;
+  border: 2px solid var(--red);
+  border-radius: 25px;
+  overflow: hidden;
+}
+
+.preset-row button {
+  flex: 1;
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  padding: 8px;
+  font-size: 14px;
+  font-family: 'mplus-black', sans-serif;
+  font-weight: 900;
+  cursor: pointer;
+}
+.preset-row button:first-child {
+  border-right: 2px solid var(--bg-black);
+}
+
+.miniScore {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid var(--red);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.score-item {
+  position: relative;
+}
+
+.score-percent {
+  font-size: 10px;
+  color: var(--red);
+  margin-bottom: 2px;
+  margin-left: 10px;
+}
+
+.score-capsule {
+  position: relative;
+  width: 100%;
+  height: 40px;
+  border: 3px solid var(--red);
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.score-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0%; /* JSで制御 */
+  background: rgba(255, 0, 0, 0.3); /* 透過赤で満たす */
+  transition: width 0.3s ease;
+  z-index: 1;
+}
+
+.score-label {
+  position: relative;
+  z-index: 2;
+  font-size: 20px;
+  color: var(--red);
+  font-family: 'mplus-thin', 'mplus-black', sans-serif;
+  letter-spacing: 2px;
+}
+
+/* =========================
+CAUTION AREA
+========================= */
+.caution-area {
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 20px;
+  color: var(--red);
+  font-family: 'mplus-thin', sans-serif; /* 本文は細めに */
+}
+
+.caution-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 900;
+  font-family: 'mplus-black', sans-serif;
+  margin-bottom: 15px;
+}
+
+.caution-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.caution-list {
+  list-style-type: none;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.caution-list li {
+  position: relative;
+  padding-left: 15px;
+  margin-bottom: 10px;
+}
+
+.caution-list li::before {
+  content: '◆';
+  position: absolute;
+  left: 0;
+  color: var(--red);
+}
+
+/* =========================
+HIDDEN ELEMENTS (機能維持用)
+========================= */
+.hidden-ui {
+  display: none;
+}
+
+/* =========================
+SIDE MENU (既存のまま)
+========================= */
+.overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:none; z-index:998; }
+.overlay.show { display:block; }
+.sideMenu { position:fixed; top:0; right:-320px; width:300px; height:100vh; background:#111; z-index:999; transition:.25s; padding-top:90px; overflow-y:auto; }
+.sideMenu.open { right:0; }
+.menuItem { width:100%; background:none; border:none; padding:18px; color:white; display:flex; align-items:center; gap:15px; font-size:20px; cursor:pointer; border-bottom:1px solid #333; }
+.menuItem img { width:28px; height:28px; }
+.page { display:none; padding:15px; }
+.page.active { display:block; }
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logoArea">
+    <div class="logoJP">ダサ<span>生成器</span></div>
+    <div class="logoEN">Dasa-T Generator</div>
+  </div>
+  <button class="menuButton" onclick="toggleMenu()">
+    <!-- 画像指定通り menu.png を使用 -->
+    <img src="menu.png" alt="menu">
+    <span class="menuText"> </span>
+  </button>
+</header>
+
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+<nav class="sideMenu" id="sideMenu">
+  <button class="menuItem" onclick="showPage('home')"><span id="txtMenuHome">ホーム</span></button>
+  <button class="menuItem" onclick="showPage('language')"><span id="txtMenuLanguage">言語設定</span></button>
+</nav>
+
+<section class="page active" id="home">
+  
+  <div class="hero-banner">
+    <div class="hero-text">ここはクソださ<span>T</span>シャツを作る場だ。</div>
+    <div class="hero-sub">KOMITYET BLYAD'FUTBOLKA</div>
+  </div>
+
+  <div class="homeCompact">
+    <!-- 左カラム: 生成エリア -->
+    <div class="col-left">
+      <div class="col-title" id="txtGenerate">生成する</div>
+      
+      <div class="miniShirt">
+        <div class="shirtText" id="shirtText">PRESS<br>GENERATE</div>
+      </div>
+
+      <div class="action-row">
+        <button class="btn-outline" onclick="copyToClipboard()">コピー</button>
+        <button class="btn-outline" onclick="shareSNS('𝕏')">共有</button>
+      </div>
+
+      <button class="generateButton" onclick="generateShirt()" id="txtGenerateButton">生成</button>
+    </div>
+
+    <!-- 右カラム: スコアエリア -->
+    <div class="col-right">
+      <div class="col-title" id="txtScorePanel">ダサい度</div>
+      
+      <div class="preset-row">
+        <button onclick="applyPreset('en')"><span style="font-size:8px;">プリセット</span><br>英語</button>
+        <button onclick="applyPreset('ru')"><span style="font-size:8px;">プリセット</span><br>ロシア語</button>
+      </div>
+
+      <div class="miniScore">
+        <!-- ダサ度 -->
+        <div class="score-item">
+          <div class="score-percent"><span id="dasaScore">0</span>%</div>
+          <div class="score-capsule">
+            <div class="score-fill" id="dasaBar"></div>
+            <div class="score-label" id="txtDasa">ダサ度</div>
+          </div>
+        </div>
+        <!-- 革命度 -->
+        <div class="score-item">
+          <div class="score-percent"><span id="revolutionScore">0</span>%</div>
+          <div class="score-capsule">
+            <div class="score-fill" id="revolutionBar"></div>
+            <div class="score-label" id="txtRevolution">革命度</div>
+          </div>
+        </div>
+        <!-- 意味不明度 -->
+        <div class="score-item">
+          <div class="score-percent"><span id="chaosScore">0</span>%</div>
+          <div class="score-capsule">
+            <div class="score-fill" id="chaosBar"></div>
+            <div class="score-label" id="txtChaos">意味不明度</div>
+          </div>
+        </div>
+        <!-- 1987% -->
+        <div class="score-item">
+          <div class="score-percent"><span id="yearScore">0</span>%</div>
+          <div class="score-capsule">
+            <div class="score-fill" id="yearBar"></div>
+            <div class="score-label">1987%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 注意事項・免責事項 -->
+  <div class="caution-area">
+    <div class="caution-title">
+      <img src="caution.png" alt="caution" class="caution-icon">
+      注意事項および免責事項
+    </div>
+    <ul class="caution-list">
+      <li>当サイトで生成されたテキストを用いたTシャツを着用したことにより、周囲から冷笑されたり、友人や恋人との関係にヒビが入ったりした場合でも、当方は一切の責任を負いません。</li>
+      <li>本ジェネレーターが算出する「ダサ度」「革命度」などのパーセンテージは独自の無意味なアルゴリズムに基づいており、医学的・科学的な根拠は一切ありません。</li>
+      <li>生成される文字列が偶然にも特定の個人、団体、思想を連想させる内容になったとしても、それはAIによるランダムな暴走の結果であり、当サイトが意図するものではありません。</li>
+      <li>Tシャツプレビュー画面の「光るエフェクト」は画面上のみの演出です。実際のTシャツが暗闇で発光するわけではありませんので、夜道での安全性向上には寄与しません。</li>
+      <li>本サービスを利用し「生成」ボタンを押下した時点で、あなたはご自身のファッションに対する「ダサさ」を受け入れる覚悟が完了したものとみなされます。用法用量を守って自己責任でご着用ください。</li>
+    </ul>
+  </div>
+
+  <!-- 機能維持のための非表示エリア -->
+  <div class="hidden-ui">
+    <input type="text" id="customTextInput" oninput="updateCustomText()">
+    <input type="range" id="paramRotate" min="-30" max="30" value="0" oninput="applyNuance()">
+    <input type="range" id="paramWeight" min="100" max="900" step="100" value="900" oninput="applyNuance()">
+    <div id="txtMainMessage"></div>
+  </div>
+
+</section>
+
+<!-- =========================
+その他のページ (言語設定等) - 既存コードを簡略化して維持
+========================= -->
+<section class="page" id="language">
+  <h2 class="col-title" id="txtLanguageTitle">言語設定</h2>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px;">
+    <button onclick="setLanguage('ja')" class="generateButton" style="height:40px; font-size:16px;">日本語</button>
+    <button onclick="setLanguage('en')" class="generateButton" style="height:40px; font-size:16px;">English</button>
+    <button onclick="setLanguage('ru-mow')" class="generateButton" style="height:40px; font-size:16px;">Русский</button>
+    <button onclick="setLanguage('ar-iq')" class="generateButton" style="height:40px; font-size:16px;">العربية</button>
+  </div>
+</section>
+
+<script>
+const WORDS = [
+  // --- 既存の単語 ---
+  "ADVICE", "POWER", "FUTURE", "SYSTEM", "UNITY", "ENERGY", 
+  "HISTORY", "GLOBAL", "REVOLUTION", "STYLE", "ROAD", "PEOPLE", "RED",
+
+  // --- 謎のテクノロジー・概念 ---
+  "HYPER", "ULTRA", "SUPER", "CYBER", "MATRIX", "DIGITAL", 
+  "NETWORK", "SIGNAL", "PULSE", "VECTOR", "CORE", "SATELLITE", 
+  "AUTOMATION", "ALGORITHM", "DATABASE", "PROTO", "MEGA", "GIGA",
+
+  // --- 意味深な抽象名詞 ---
+  "DESTINY", "JUSTICE", "VICTORY", "LIBERTY", "FREEDOM", "EMPIRE", 
+  "PARADISE", "INFINITY", "DIMENSION", "ILLUSION", "PHANTOM", 
+  "SILENCE", "SHADOW", "STORM", "GENESIS", "ECHO", "SECRET",
+
+  // --- 勢いと感情・アクション ---
+  "ACTION", "BREAK", "CRASH", "DRIVE", "MAXIMUM", "PASSION", 
+  "SPIRIT", "DREAM", "FIGHTER", "ATTACK", "SHOCK", "DANGER", 
+  "EXPLO", "SPEED", "EXPLOSION", "SURVIVAL", "CHALLENGE",
+
+  // --- 謎の組織・社会っぽさ ---
+  "UNION", "AGENCY", "FEDERATION", "ZONE", "PROJECT", "SECTOR", 
+  "COMMAND", "COMMITTEE", "DEPARTMENT", "SQUAD", "GUILD",
+
+  // --- カタカナ英語・ダサT特有のテイスト ---
+  "DASA", "KUSO", "SOVIET", "T-SHIRT", "PRINT", "GRAPHIC", 
+  "LIMITED", "AUTHENTIC", "ORIGINAL", "HEAVY", "COTTON", "SELECT"
+];
+
+
+function randomWord(){ return WORDS[Math.floor(Math.random()*WORDS.length)]; }
+function randomScore(){ return Math.floor(Math.random()*101); }
+
+function setMeter(id, val){
+  document.getElementById(id).textContent = val;
+  document.getElementById(id.replace("Score","Bar")).style.width = val + "%";
+}
+
+function updateCustomText() {
+  const val = document.getElementById("customTextInput").value;
+  if(val.trim() !== "") {
+    document.getElementById("shirtText").innerHTML = val.replace(/\n/g, "<br>");
+  }
+}
+
+function applyPreset(lang) {
+  let text = "";
+  if(lang === 'ja') text = "意味不明<br>大革命";
+  if(lang === 'en') text = "GLOBAL<br>ROAD SYSTEM";
+  if(lang === 'ru') text = "СИСТЕМА<br>1987";
+  if(lang === 'ar') text = "طاقة<br>المستقبل";
+  document.getElementById("customTextInput").value = text.replace(/<br>/g, "\n");
+  document.getElementById("shirtText").innerHTML = text;
+}
+
+function applyNuance() {
+  const deg = document.getElementById("paramRotate").value;
+  const weight = document.getElementById("paramWeight").value;
+  const target = document.getElementById("shirtText");
+  target.style.transform = `rotate(${deg}deg)`;
+  target.style.fontWeight = weight;
+}
+
+function shareSNS(platform) {
+  alert(`${platform}にデザインを共有しました！`);
+}
+
+function copyToClipboard() {
+  const text = document.getElementById("shirtText").innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    alert("Tシャツのテキストをクリップボードにコピーしました！");
+  });
+}
+
+function generateShirt(){
+  const y = 1960 + Math.floor(Math.random()*40);
+  const a = Math.floor(Math.random()*9)+2;
+  const b = Math.floor(Math.random()*4)+2;
+  const w1 = randomWord();
+  const w2 = randomWord();
+  const w3 = randomWord();
+  const generatedHTML = w1+" "+w2+"<br>"+w3+"<br><br>"+y+" × "+a+" ÷ "+b+" = FUTURE";
+  
+  document.getElementById("customTextInput").value = ""; 
+  document.getElementById("shirtText").innerHTML = generatedHTML;
+  
+  document.getElementById("paramRotate").value = Math.floor(Math.random()*40) - 20;
+  document.getElementById("paramWeight").value = (Math.floor(Math.random()*9) + 1) * 100;
+  applyNuance();
+  
+  setMeter("dasaScore", randomScore());
+  setMeter("revolutionScore", randomScore());
+  setMeter("chaosScore", randomScore());
+  setMeter("yearScore", randomScore());
+}
+
+function toggleMenu(){
+  document.getElementById("sideMenu").classList.toggle("open");
+  document.getElementById("overlay").classList.toggle("show");
+}
+
+function showPage(id){
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  if(document.getElementById("sideMenu").classList.contains("open")) {
+    toggleMenu();
+  }
+  window.scrollTo(0,0);
+}
+
+const TRANS = {
+  ja: { m:"ホーム", l:"言語設定", gen:"生成する", btn:"生成", sc:"ダサい度", d:"ダサ度", rev:"革命度", c:"意味不明度" },
+  en: { m:"Home", l:"Language", gen:"Generate", btn:"Gen", sc:"Absurdity", d:"Dasa", rev:"Revolution", c:"Chaos" },
+  "ru-mow": { m:"Главная", l:"Язык", gen:"Создать", btn:"Старт", sc:"Оценки", d:"Ужас", rev:"Прорыв", c:"Хаос" },
+  "ar-iq": { m:"الرئيسية", l:"اللغة", gen:"توليد", btn:"صنع", sc:"النقاط", d:"مستوى السوء", rev:"ثورة", c:"فوضى" }
+};
+
+function setLanguage(lang){
+  const t = TRANS[lang] || TRANS['en'];
+  document.getElementById("txtMenuHome").textContent = t.m;
+  document.getElementById("txtMenuLanguage").textContent = t.l;
+  document.getElementById("txtGenerate").textContent = t.gen;
+  document.getElementById("txtGenerateButton").textContent = t.btn;
+  document.getElementById("txtScorePanel").textContent = t.sc;
+  document.getElementById("txtDasa").textContent = t.d;
+  document.getElementById("txtRevolution").textContent = t.rev;
+  document.getElementById("txtChaos").textContent = t.c;
+  
+  if(lang.startsWith("ar")) {
+      document.body.style.direction = "rtl";
+  } else {
+      document.body.style.direction = "ltr";
+  }
+}
+
+// 初期化
+generateShirt();
+</script>
+
+</body>
+</html>
